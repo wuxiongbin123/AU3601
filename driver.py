@@ -1,5 +1,5 @@
 #!/usr/bin/env python
- 
+# -*- coding: utf-8 -*-
 # from this import d
 import rospy
 import random
