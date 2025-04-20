@@ -54,7 +54,7 @@ else:
     sorted_points = points_array
 
 # sorted_points就是最终结果
-sorted_points = sorted_points.tolist()
+sorted_points = sorted_points.tolist()[::2]
 with open("trajectory.txt", "w") as f:
     for i in range(len(sorted_points)):
         f.writelines(str(sorted_points[i])+"\n")

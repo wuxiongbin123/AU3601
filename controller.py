@@ -158,7 +158,8 @@ class Controller():
                     self.x, self.y, self.idx))
                 
                 # 更新到下一个路径点（防越界）
-                self.idx = min(self.idx + 1, len(path) - 1)
+                self.idx = self.idx + 1
+                if self.idx == len(path) - 1: return 
                 self.target_x, self.target_y = path[self.idx]
                 rospy.loginfo("切换至路径点#{}".format(self.idx))
             
