@@ -13,6 +13,7 @@ from sensor_msgs.msg import LaserScan
 import math
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
+from gazebo_msgs.msg import ModelState
 
 # 全局路径点容器
 path = []
@@ -116,7 +117,20 @@ class Controller():
         # ROS通信接口
         self.pub = rospy.Publisher('/robot/control', Twist, queue_size=10)
         self.marker_pub = rospy.Publisher('/path_markers', Marker, queue_size=10)
-        rospy.Subscriber('/robot/observe', LaserScan, self.observe_callback)
+        # rospy.Subscriber('/robot/observe', LaserScan, self.observe_callback)
+
+        self.model_state_sub = rospy.Subscriber(
+            "/robot/esti_model_state", 
+            ModelState, 
+            self.model_state_callback,
+            queue_size=10
+        )
+    
+    def model_state_callback(self, msg):
+        """处理接收到的模型状态信息"""
+        self.esti_model_state = msg
+        self.x = msg.pose.position.x
+        self.y = msg.pose.position.y
 
     def observe_callback(self, laserscan):
         """激光雷达数据回调函数
@@ -131,9 +145,9 @@ class Controller():
         r0, r1 = laserscan.ranges[0], laserscan.ranges[1]
         
 
-        # 转换为全局坐标（假设激光测距为相对5m基准的偏移）
-        self.x = 5.0 - r0
-        self.y = 5.0 - r1
+        self.x = 5 - r0
+        self.y = 5 - r1
+
 
     def run(self):
         """主控制循环"""

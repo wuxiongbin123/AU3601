@@ -130,45 +130,43 @@ class Localization(object):
     ################################################################################################
     ## ================================ Edit below here ================================ vvvvvvvvvvv
     def callback_control(self, twist):
-        # extract control signal from message
-
+        # 提取控制信号
         u = np.zeros([2, 1])
         u[0][0] = twist.linear.x
-        u[1][0] = twist.angular.z
+        u[1][0] = twist.linear.y
 
         current_time =  rospy.get_time()
         
-        # call control moment function in Kalman filter
         self.kf.control_moment(u,  rospy.get_time())
 
-        # save data for visualization
+        # 保存数据用于可视化
         self.x_esti_save.append(self.kf.x)
         self.x_esti_time.append(current_time)
 
     def callback_observe(self, laserscan):
-        # extract observe signal from message
-        obj = np.array(
+        # 获取观测信号        
+        r0 = laserscan.ranges[0]
+        r1 = laserscan.ranges[1]
+        y = np.array(
             [
-                [laserscan.ranges[0]],
-                [laserscan.ranges[1]]
+                [5 - r0],
+                [5 - r1]
             ]
-            )
-        y = 5.0 - obj
+        )
 
         current_time = rospy.get_time()
 
         
-        # call observe moment function in Kalman filter
         self.kf.observe_moment(y, current_time)
         
 
-        # save data for visualzation
+        # 储存数据用于可视化
         self.x_esti_save.append(self.kf.x)
         self.x_esti_time.append(current_time)
         self.p_obsv_save.append(y)
         self.p_obsv_time.append(current_time)
 
-        # send estimated x to controller
+        # 把状态
         self.sendStateMsg()
     ## ==========================================================================  ^^^^^^^^^^
     ## ===================================== Edit above =====================================
